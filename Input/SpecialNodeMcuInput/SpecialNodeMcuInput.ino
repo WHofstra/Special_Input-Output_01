@@ -5,7 +5,7 @@
 
 const char* ssid     = "Medialab"; // wifi lan
 const char* password = "Mediacollege"; // wifi lan
-const char*  server  = "schw.hosts.ma-cloud.nl"; // deployment server
+const char*  server  = "29980.hosts2.ma-cloud.nl"; // deployment server
 
 String path          = "/test.json"; // path to file
 static const uint8_t wifiConnecting = D1;//LED indicator wifi status flashing while connecting
@@ -83,8 +83,9 @@ void extractJson()//extract JSON string from HTTP data
     Serial.println("parseObject() failed");
     return;
   }
-  parseJson( json_object);//parse the commands from the json object
   */
+  //parseJson(json_object);//parse the commands from the json object
+  
 }
 
 void payload() // extract wanted data from HTTP response
