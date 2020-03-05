@@ -71,20 +71,17 @@ void extractJson()//extract JSON string from HTTP data
   int size = httpResponse.length() + 1;
   char json[size];
   httpResponse.toCharArray(json, size);
- // StaticJsonBuffer<200> jsonBuffer;  // <===== oude lib
- StaticJsonDocument<256> json_object; //<==== nieuwe lib
- // JsonObject& json_object = jsonBuffer.parseObject(json);  // <===== oude lib
- deserializeJson(json_object, json); // <==== nieuwe lib
- /*
-  oude lib
-  
+ StaticJsonBuffer<200> jsonBuffer;  // <===== oude lib
+ // StaticJsonDocument<256> json_object; //<==== nieuwe lib
+ JsonObject& json_object = jsonBuffer.parseObject(json);  // <===== oude lib
+ // deserializeJson(json_object, json); // <==== nieuwe lib
+ 
   if (!json_object.success())
   {
     Serial.println("parseObject() failed");
     return;
   }
-  */
-  //parseJson(json_object);//parse the commands from the json object
+  parseJson(json_object);//parse the commands from the json object
   
 }
 
