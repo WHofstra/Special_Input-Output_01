@@ -7,7 +7,7 @@ const char* ssid     = "Medialab"; // wifi lan
 const char* password = "Mediacollege"; // wifi lan
 const char*  server  = "29980.hosts2.ma-cloud.nl"; // deployment server
 
-String path          = "/test.json"; // path to file
+String path          = "/bewijzenmap/SpIO/testGetPost.php"; // path to file
 static const uint8_t wifiConnecting = D1;//LED indicator wifi status flashing while connecting
 static const uint8_t wifiOk = D2;//LED indicator wifi status ON if connected
 //static const uint8_t servo1 = D3; //servo 1 op D3
@@ -109,9 +109,12 @@ void httpRequest()// get HTTP response from webserver
   WiFiClient client; //instance
   
   if (client.connect(server, 80)) { //connect to webserver on port 80
-    client.println("GET " + path +  " HTTP/1.1");//construct a HTTP GET request
+    client.println("GET " + path + "?GET=" + "{}" + " HTTP/1.1");//construct a HTTP GET request
+    Serial.println("GET " + path + "?GET=" + "{}" + " HTTP/1.1");
     client.println("Host: " + String(server));
+    Serial.println("Host: " + String(server));
     client.println("Connection: keep-alive");
+    Serial.println("Connection: keep-alive");
     client.println();
   }
   else {
