@@ -64,13 +64,14 @@ void sendValues()
   gyroString = addToJsonString(GyZ, "GyZ", gyroString, true);
   
   Serial.println(gyroString);
-  delay(500);
+  delay(5);
 }
 
 String addToJsonString(int16_t value, String valueName, String jsonString, bool lastValue)
 {
-  if (!lastValue) jsonString += ("\"" + valueName + "\":\"" + String(value) + "\",");
-  else jsonString += ("\"" + valueName + "\":\"" + String(value) + "\"}");
+  jsonString += ("\"" + valueName + "\":" + String(value));
+  if (!lastValue) jsonString += ",";
+  else jsonString += "}";
   
   return jsonString;
 }
@@ -83,7 +84,7 @@ void wifiConnect()
   WiFi.begin(ssid, password);
   
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(5);
     Serial.print(".");
     if (ledState == 0) ledState = 1;
     else ledState = 0;
