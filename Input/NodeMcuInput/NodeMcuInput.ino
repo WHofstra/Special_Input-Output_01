@@ -23,6 +23,7 @@ void setup()
   Wire.write(0x6B);  // PWR_MGMT_1 Register
   Wire.write(0);     // Set to 0 (Wakes up the MPU-6050)
   Wire.endTransmission(true);
+  delay(30);
   
   Serial.begin(115200); //Baud-rate: 115200
   pinMode(wifiPin, OUTPUT); //LED Indicates WiFi Connection
@@ -64,7 +65,7 @@ void sendValues()
   gyroString = addToJsonString(GyZ, "GyZ", gyroString, true);
   
   Serial.println(gyroString);
-  delay(5);
+  delay(50);
 }
 
 String addToJsonString(int16_t value, String valueName, String jsonString, bool lastValue)
@@ -84,7 +85,7 @@ void wifiConnect()
   WiFi.begin(ssid, password);
   
   while (WiFi.status() != WL_CONNECTED) {
-    delay(5);
+    delay(100);
     Serial.print(".");
     if (ledState == 0) ledState = 1;
     else ledState = 0;
