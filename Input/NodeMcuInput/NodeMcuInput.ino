@@ -1,5 +1,4 @@
 #include <ESP8266WiFi.h>
-#include <ArduinoJson.h> //Using Version 5.13.5
 #include <Wire.h>
 
 const char* ssid     = "Medialab";
@@ -19,13 +18,9 @@ int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 void setup()
 {
   Wire.begin();
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x6B);  // PWR_MGMT_1 Register
-  Wire.write(0);     // Set to 0 (Wakes up the MPU-6050)
-  Wire.endTransmission(true);
-  delay(30);
-  
   Serial.begin(115200); //Baud-rate: 115200
+  
+  mpu6050Begin(MPU_addr);
   pinMode(wifiPin, OUTPUT); //LED Indicates WiFi Connection
 }
 
@@ -37,6 +32,36 @@ void loop()
   }
   sendValues();
   httpRequest(aPath, g, gyroString);
+}
+
+void mpu6050Begin(byte addr)
+{
+  if (checkI2C(addr))
+  {
+    Wire.beginTransmission(addr);
+    Wire.write(0x6B);  // PWR_MGMT_1 Register
+    Wire.write(0);     // Set to 0 (Wakes up the MPU-6050)
+    Wire.endTransmission(true);
+    delay(30);
+  }
+}
+
+bool checkI2C(byte addr)
+{
+  Wire.beginTransmission(addr);
+  
+  if (Wire.endTransmission() == 0)
+  {
+    Serial.print("Device found at 0x");
+    Serial.println(addr, HEX);
+    return true;
+  }
+  else
+  {
+    Serial.print("Device not found at 0x");
+    Serial.println(addr, HEX);
+    return false;
+  }
 }
 
 //Assign Registers to Variables
