@@ -12,11 +12,11 @@ class Character
 			DAISY, DRY_BONES, WALUIGI, SHY_GUY, ROB
 		};
 
-		Character(int aPosX, int aPosY, int aRot, CType* aType, sf::Texture aTexture);
+		Character(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture);
 		~Character();
 
-		void SetCharacterSprite(sf::Texture* aTexture);
-
+		sf::Sprite SetCharacterSprite(sf::Texture* aTexture);
+		sf::Sprite GetWindowSpriteDisplay();
 		std::string GetCharacterType();
 
 	protected:

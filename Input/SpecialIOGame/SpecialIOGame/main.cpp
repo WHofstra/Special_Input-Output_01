@@ -21,14 +21,22 @@ int main()
 								 new Stage(Stage::StageName::MARIO_CIRCUIT),
 								 new Stage(Stage::StageName::BOWSERS_CASTLE) };
 
+	//Define Texture Character Sprite References
+	sf::Texture objectTexture;
+	if (!objectTexture.loadFromFile("Assets/CharacterSprites.png"))
+	{
+		return EXIT_FAILURE;
+	}
+	objectTexture.setSmooth(true);
+
 	//Define Characters
-	//Player* player = new Player(ceil(WIN_WIDTH/2), ceil(WIN_HEIGHT / 2), 0, Character::CType::WALUIGI);
+	Player* player = new Player(WIN_WIDTH / 2, WIN_HEIGHT / 2, 0, Character::CType::WALUIGI, &objectTexture);
 
 	//List Iterator Pointing to Start of List
 	std::list<Stage*>::iterator sIt = stages.begin();
 
 	//Display Stage
-	StageDisplay* stageDisplay = new StageDisplay(*sIt, &window, (double)ceil(WIN_WIDTH/2), (double)ceil(WIN_HEIGHT/2));
+	StageDisplay* stageDisplay = new StageDisplay(*sIt, &window, WIN_WIDTH/2, WIN_HEIGHT/2);
 	//std::cout << stageDisplay->GetStageName() << std::endl; //For Debug Purposes
 
 	//Start Game Loop
@@ -50,8 +58,9 @@ int main()
 		//Clear Window
 		window.clear();
 
-		//Draw Stage
+		//Draw
 		window.draw(stageDisplay->GetStageWindowDisplay());
+		window.draw(player->GetWindowSpriteDisplay());
 
 		//Display Window
 		window.display();

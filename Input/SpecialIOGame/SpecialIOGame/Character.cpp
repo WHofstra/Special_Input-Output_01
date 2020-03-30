@@ -1,9 +1,10 @@
 #include "Character.h"
 
-Character::Character(int aPosX, int aPosY, int aRot, CType* aType, sf::Texture aTexture)
-	:currentCharacter(aType)
+Character::Character(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture)
+	: currentCharacter(&aType), posX(aPosX), posY(aPosY), rotation(aRot)
 {
-
+	sprite = SetCharacterSprite(aTexture);
+	sprite.setPosition((float)aPosX, (float)aPosY);
 }
 
 Character::~Character()
@@ -11,9 +12,18 @@ Character::~Character()
 
 }
 
-void Character::SetCharacterSprite(sf::Texture* aTexture)
+sf::Sprite Character::SetCharacterSprite(sf::Texture* aTexture)
 {
-	sf::Sprite aSprite(*aTexture);
+	sf::Sprite* aSprite = &sprite;
+	aSprite->setTexture(*aTexture);
+	aSprite->setTextureRect(sf::IntRect(0, 0, 8, 8));
+	aSprite->setOrigin(ceil(aSprite->getLocalBounds().width / 2), ceil(aSprite->getLocalBounds().height / 2));
+	return *aSprite;
+}
+
+sf::Sprite Character::GetWindowSpriteDisplay()
+{
+	return sprite;
 }
 
 std::string Character::GetCharacterType()
