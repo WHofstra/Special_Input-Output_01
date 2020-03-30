@@ -1,8 +1,10 @@
 #include "StageDisplay.h"
 
 StageDisplay::StageDisplay(Stage* aStage, sf::RenderWindow* aWindow, int posX, int posY)
-	:currentStage(aStage)
+	:currentStage(aStage), window(aWindow)
 {
+	position[ posX, posY ];
+
 	//Load Texture
 	if (!texture.loadFromFile("Assets/Maps.png"))
 	{
@@ -11,8 +13,7 @@ StageDisplay::StageDisplay(Stage* aStage, sf::RenderWindow* aWindow, int posX, i
 	}
 	texture.setSmooth(true);
 
-	SetStageNames();
-	sprite = SetStageSprite(&texture, currentStage->GetStageName(), &posX, &posY);
+	sprite = SetStageSprite(&texture, window, currentStage->GetStageName(), &position[0], &position[1]);
 }
 
 StageDisplay::~StageDisplay()
@@ -20,32 +21,27 @@ StageDisplay::~StageDisplay()
 
 }
 
-void StageDisplay::SetStageNames()
-{
-	//Add the Stage Names
-	stageNames[Stage::StageName::DONUT_PLAINS]   = "Donut Plains";
-	stageNames[Stage::StageName::MARIO_CIRCUIT]  = "Mario Circuit";
-	stageNames[Stage::StageName::BOWSERS_CASTLE] = "Bowser's Castle";
-}
-
 void StageDisplay::SetStage(Stage* aStage)
 {
 	currentStage = aStage;
+	sprite = SetStageSprite(&texture, window, currentStage->GetStageName(), &position[0], &position[1]);
 }
 
-sf::Sprite StageDisplay::SetStageSprite(sf::Texture* aTexture, Stage::StageName aStageName, int* posX, int* posY)
+sf::Sprite StageDisplay::SetStageSprite(sf::Texture* aTexture, sf::RenderWindow* aWindow,
+	Stage::StageName aStageName, int* posX, int* posY)
 {
-	sf::Sprite aSprite(*aTexture);
+	sf::Sprite* aSprite = &sprite;
+	aSprite->setTexture(*aTexture);
 
 	switch (aStageName)
 	{ //Get a Part of the Texture
 	    case 0:
-			aSprite.setTextureRect(sf::IntRect(0, 0, 1023, 1023));
+			aSprite->setTextureRect(sf::IntRect(0, 0, 1023, 1023));
 		    break;
 	}
-	aSprite.setOrigin(ceil(aSprite.getLocalBounds().width / 2), ceil(aSprite.getLocalBounds().height / 2));
-	aSprite.setPosition(*posX, *posY);
-	return aSprite;
+	aSprite->setOrigin(ceil(aSprite->getLocalBounds().width / 2), ceil(aSprite->getLocalBounds().height / 2));
+	aSprite->setPosition((float)*posX, (float)*posY);
+	return *aSprite;
 }
 
 sf::Sprite StageDisplay::GetStageWindowDisplay()
@@ -55,5 +51,11 @@ sf::Sprite StageDisplay::GetStageWindowDisplay()
 
 std::string StageDisplay::GetStageName()
 {
-	return stageNames[currentStage->GetStageName()];
+	switch (currentStage->GetStageName())
+	{
+		case 0: return "Donut Plains";
+		case 1: return "Mario Circuit";
+		case 2: return "Bowser's Castle";
+	}
+	return "[TBA]";
 }

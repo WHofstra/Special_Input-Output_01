@@ -4,6 +4,7 @@
 
 #include "Stage.h"
 #include "StageDisplay.h"
+#include "Player.h"
 
 int main()
 {
@@ -20,11 +21,15 @@ int main()
 								 new Stage(Stage::StageName::MARIO_CIRCUIT),
 								 new Stage(Stage::StageName::BOWSERS_CASTLE) };
 
+	//Define Characters
+	//Player* player = new Player(ceil(WIN_WIDTH/2), ceil(WIN_HEIGHT / 2), 0, Character::CType::WALUIGI);
+
 	//List Iterator Pointing to Start of List
 	std::list<Stage*>::iterator sIt = stages.begin();
 
 	//Display Stage
-	StageDisplay* stageDisplay = new StageDisplay(*sIt, &window, WIN_WIDTH/2, WIN_HEIGHT/2);
+	StageDisplay* stageDisplay = new StageDisplay(*sIt, &window, (double)ceil(WIN_WIDTH/2), (double)ceil(WIN_HEIGHT/2));
+	//std::cout << stageDisplay->GetStageName() << std::endl; //For Debug Purposes
 
 	//Start Game Loop
 	//while (gameRunning) //Use This for OpenGL Rendering

@@ -1,14 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <Wire.h>
 
-const float MPU_GYRO_250_SCALE = 131.0;
+/*const float MPU_GYRO_250_SCALE = 131.0;
 const float MPU_GYRO_500_SCALE = 65.5;
 const float MPU_GYRO_1000_SCALE = 32.8;
 const float MPU_GYRO_2000_SCALE = 16.4;
 const float MPU_ACCL_2_SCALE = 16384.0;
 const float MPU_ACCL_4_SCALE = 8192.0;
 const float MPU_ACCL_8_SCALE = 4096.0;
-const float MPU_ACCL_16_SCALE = 2048.0;
+const float MPU_ACCL_16_SCALE = 2048.0;*/
 
 const char* ssid     = "Medialab";
 const char* password = "Mediacollege";
@@ -23,7 +23,7 @@ String httpResponse;
 
 static const uint8_t wifiPin = D4; //Use D4-pin as Output
 
-struct rawdata
+/*struct rawdata
 {
   int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 };
@@ -31,7 +31,7 @@ struct rawdata
 struct scaleddata
 {
   float AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
-};
+};*/
 
 void setup()
 {
@@ -82,14 +82,14 @@ bool checkI2C(byte addr)
   }
 }
 
-void setMPU6050scales(byte addr, uint8_t Gyro, uint8_t Accl)
+/*void setMPU6050scales(byte addr, uint8_t Gyro, uint8_t Accl)
 {
   Wire.beginTransmission(addr);
   Wire.write(0x1B); // Write to Register Starting at 0x1B
   Wire.write(Gyro); // Self Tests Off and Set Gyro FS to 250
   Wire.write(Accl); // Self Tests Off and Set Accl FS to 8g
   Wire.endTransmission(true);
-}
+}*/
 
 //Assign Registers to Variables
 void sendValues()
