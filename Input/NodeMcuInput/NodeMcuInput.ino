@@ -1,14 +1,14 @@
 #include <ESP8266WiFi.h>
 #include <Wire.h>
 
-/*const float MPU_GYRO_250_SCALE = 131.0;
+const float MPU_GYRO_250_SCALE = 131.0;
 const float MPU_GYRO_500_SCALE = 65.5;
 const float MPU_GYRO_1000_SCALE = 32.8;
 const float MPU_GYRO_2000_SCALE = 16.4;
 const float MPU_ACCL_2_SCALE = 16384.0;
 const float MPU_ACCL_4_SCALE = 8192.0;
 const float MPU_ACCL_8_SCALE = 4096.0;
-const float MPU_ACCL_16_SCALE = 2048.0;*/
+const float MPU_ACCL_16_SCALE = 2048.0;
 
 const char* ssid     = "Medialab";
 const char* password = "Mediacollege";
@@ -23,7 +23,7 @@ String httpResponse;
 
 static const uint8_t wifiPin = D4; //Use D4-pin as Output
 
-/*struct rawdata
+struct rawdata
 {
   int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 };
@@ -31,7 +31,9 @@ static const uint8_t wifiPin = D4; //Use D4-pin as Output
 struct scaleddata
 {
   float AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
-};*/
+};
+
+scaleddata sdValues;
 
 void setup()
 {
@@ -44,14 +46,20 @@ void setup()
 
 void loop()
 {
-  if (WiFi.status() != WL_CONNECTED)
-  {
+  if (WiFi.status() != WL_CONNECTED) {
     wifiConnect();
   }
-  //sendValues();
-  //httpRequest(aPath, g, gyroString);
+  setMPU6050scales(MPU_addr,0b00000000,0b00010000);
+  sdValues = convertRawToScaled(MPU_addr, mpu6050Read(MPU_addr));
+
+  if (sdValues.AcX > 1 || sdValues.AcX < -1){
+    httpRequest(aPath, g, gyroString); //Send String to Ma-Cloud
+  }
+  
+  delay(500);
 }
 
+//Wake Up MPU-6050
 void mpu6050Begin(byte addr)
 {
   if (checkI2C(addr))
@@ -82,42 +90,25 @@ bool checkI2C(byte addr)
   }
 }
 
-/*void setMPU6050scales(byte addr, uint8_t Gyro, uint8_t Accl)
-{
-  Wire.beginTransmission(addr);
-  Wire.write(0x1B); // Write to Register Starting at 0x1B
-  Wire.write(Gyro); // Self Tests Off and Set Gyro FS to 250
-  Wire.write(Accl); // Self Tests Off and Set Accl FS to 8g
-  Wire.endTransmission(true);
-}*/
-
 //Assign Registers to Variables
-void sendValues()
+rawdata mpu6050Read(byte addr)
 {
+  rawdata values;
+  
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x3B);  //Starting with Register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
   Wire.requestFrom(MPU_addr, 14, true);  //Request a Total of 14 Registers
 
-  AcX = Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
-  AcY = Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  AcZ = Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  Tmp = Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
-  GyX = Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
-  GyY = Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
-  GyZ = Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+  values.AcX = Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
+  values.AcY = Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  values.AcZ = Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  values.Tmp = Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  values.GyX = Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+  values.GyY = Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+  values.GyZ = Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 
-  //Generate Json-string from Values
-  gyroString = "{";
-  gyroString = addToJsonString(AcX, "AcX", gyroString, false);
-  gyroString = addToJsonString(AcY, "AcY", gyroString, false);
-  gyroString = addToJsonString(AcZ, "AcZ", gyroString, false);
-  gyroString = addToJsonString(GyX, "GyX", gyroString, false);
-  gyroString = addToJsonString(GyY, "GyY", gyroString, false);
-  gyroString = addToJsonString(GyZ, "GyZ", gyroString, true);
-  
-  Serial.println(gyroString);
-  delay(50);
+  return values;
 }
 
 String addToJsonString(int16_t value, String valueName, String jsonString, bool lastValue)
@@ -127,6 +118,79 @@ String addToJsonString(int16_t value, String valueName, String jsonString, bool 
   else jsonString += "}";
   
   return jsonString;
+}
+
+void setMPU6050scales(byte addr, uint8_t Gyro, uint8_t Accl)
+{
+  Wire.beginTransmission(addr);
+  Wire.write(0x1B); // Write to Register Starting at 0x1B
+  Wire.write(Gyro);
+  Wire.write(Accl);
+  Wire.endTransmission(true);
+}
+
+void getMPU6050scales(byte addr,uint8_t &Gyro,uint8_t &Accl)
+{
+  Wire.beginTransmission(addr);
+  Wire.write(0x1B); // Starting with Register 0x3B (ACCEL_XOUT_H)
+  Wire.endTransmission(false);
+  Wire.requestFrom(addr,2,true); // Request a Total of 14 Registers
+  Gyro = (Wire.read()&(bit(3)|bit(4)))>>3;
+  Accl = (Wire.read()&(bit(3)|bit(4)))>>3;
+}
+
+//Convert Raw  Data to Scaled Data
+scaleddata convertRawToScaled(byte addr, rawdata data_in)
+{
+  scaleddata values;
+  float scale_value = 0.0;
+  byte Gyro, Accl;
+ 
+  getMPU6050scales(MPU_addr, Gyro, Accl);
+ 
+  switch (Gyro) {
+    case 0: scale_value = MPU_GYRO_250_SCALE; break;
+    case 1: scale_value = MPU_GYRO_500_SCALE; break;
+    case 2: scale_value = MPU_GYRO_1000_SCALE; break;
+    case 3: scale_value = MPU_GYRO_2000_SCALE; break;
+    default:  break;
+  }
+ 
+  values.GyX = (float) data_in.GyX / scale_value;
+  values.GyY = (float) data_in.GyY / scale_value;
+  values.GyZ = (float) data_in.GyZ / scale_value;
+  scale_value = 0.0;
+  
+  switch (Accl) {
+    case 0: scale_value = MPU_ACCL_2_SCALE; break;
+    case 1: scale_value = MPU_ACCL_4_SCALE; break;
+    case 2: scale_value = MPU_ACCL_8_SCALE; break;
+    case 3: scale_value = MPU_ACCL_16_SCALE; break;
+    default:  break;
+  }
+
+  values.AcX = (float) data_in.AcX / scale_value;
+  values.AcY = (float) data_in.AcY / scale_value;
+  values.AcZ = (float) data_in.AcZ / scale_value;
+  values.Tmp = (float) data_in.Tmp / 340.0 + 36.53;
+
+  gyroString = generateJson(gyroString, values);
+  return values;
+}
+
+String generateJson(String stringStart, scaleddata val)
+{
+  //Generate Json-string from Values
+  stringStart = "{";
+  stringStart = addToJsonString(val.AcX, "AcX", stringStart, false);
+  stringStart = addToJsonString(val.AcY, "AcY", stringStart, false);
+  stringStart = addToJsonString(val.AcZ, "AcZ", stringStart, false);
+  stringStart = addToJsonString(val.GyX, "GyX", stringStart, false);
+  stringStart = addToJsonString(val.GyY, "GyY", stringStart, false);
+  stringStart = addToJsonString(val.GyZ, "GyZ", stringStart, true);
+  
+  Serial.println(stringStart);
+  return stringStart;
 }
 
 //Connect to Local Network
