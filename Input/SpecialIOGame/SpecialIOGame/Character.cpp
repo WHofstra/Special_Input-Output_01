@@ -1,15 +1,28 @@
 #include "Character.h"
 
 Character::Character(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture)
-	: currentCharacter(&aType), posX(aPosX), posY(aPosY), rotation(aRot)
+	: currentCharacter(&aType)
 {
+	position = sf::Vector2f(aPosX, aPosY);
+	velocity = sf::Vector2f(0, 0);
+	speed = sf::Vector2f(0.05f, 0.075f);
+
 	sprite = SetCharacterSprite(aTexture);
-	sprite.setPosition((float)aPosX, (float)aPosY);
+	sprite.setPosition((float)position.x, (float)position.y);
+
+	SetRotation(aRot);
 }
 
 Character::~Character()
 {
 
+}
+
+void Character::Update()
+{
+	position += velocity;
+	sprite.setPosition(position);
+	sprite.setRotation(rotation);
 }
 
 sf::Sprite Character::SetCharacterSprite(sf::Texture* aTexture)
@@ -26,24 +39,14 @@ sf::Sprite Character::GetWindowSpriteDisplay()
 	return sprite;
 }
 
-std::string Character::GetCharacterType()
+void Character::SetVelocity(int velX, int velY)
 {
-	switch (*currentCharacter)
-	{
-		case 0:  return "Mario";
-		case 1:  return "Luigi";
-		case 2:  return "Peach";
-		case 3:  return "Yoshi";
-		case 4:  return "Toad";
-		case 5:  return "Bowser";
-		case 6:  return "Donkey Kong";
-		case 7:  return "Koopa Troopa";
-		case 8:  return "Wario";
-		case 9:  return "Daisy";
-		case 10: return "Dry Bones";
-		case 11: return "Waluigi";
-		case 12: return "Shy Guy";
-		case 13: return "R.O.B.";
-	}
-	return "[TBA]";
+	velocity.x = velX;
+	velocity.y = velY;
+}
+
+void Character::SetRotation(int aRot)
+{
+	rotation = aRot;
+	sprite.setRotation((float)aRot);
 }

@@ -3,7 +3,7 @@
 StageDisplay::StageDisplay(Stage* aStage, sf::RenderWindow* aWindow, int posX, int posY)
 	:currentStage(aStage), window(aWindow)
 {
-	position[ posX, posY ];
+	position = sf::Vector2i(posX, posY);
 
 	//Load Texture
 	if (!texture.loadFromFile("Assets/Maps.png"))
@@ -13,7 +13,7 @@ StageDisplay::StageDisplay(Stage* aStage, sf::RenderWindow* aWindow, int posX, i
 	}
 	texture.setSmooth(true);
 
-	sprite = SetStageSprite(&texture, window, currentStage->GetStageName(), &position[0], &position[1]);
+	sprite = SetStageSprite(&texture, window, currentStage->GetStageName(), &position.x, &position.y);
 }
 
 StageDisplay::~StageDisplay()
@@ -24,7 +24,7 @@ StageDisplay::~StageDisplay()
 void StageDisplay::SetStage(Stage* aStage)
 {
 	currentStage = aStage;
-	sprite = SetStageSprite(&texture, window, currentStage->GetStageName(), &position[0], &position[1]);
+	sprite = SetStageSprite(&texture, window, currentStage->GetStageName(), &position.x, &position.y);
 }
 
 sf::Sprite StageDisplay::SetStageSprite(sf::Texture* aTexture, sf::RenderWindow* aWindow,

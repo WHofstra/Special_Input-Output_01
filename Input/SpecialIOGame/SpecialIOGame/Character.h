@@ -15,12 +15,24 @@ class Character
 		Character(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture);
 		~Character();
 
+		virtual void Update();
+
 		sf::Sprite SetCharacterSprite(sf::Texture* aTexture);
 		sf::Sprite GetWindowSpriteDisplay();
+
 		std::string GetCharacterType();
+		float GetCharacterSpeed();
+
+		void SetCharacterSpeed(CType* aType);
+		void SetVelocity(int velX, int velY);
+		void SetRotation(int aRot);
 
 	protected:
 		CType* currentCharacter;
 		sf::Sprite sprite;
-		int posX, posY, rotation;
+
+		sf::Vector2f position;
+		sf::Vector2f velocity;
+		sf::Vector2f speed;
+		int rotation;
 };

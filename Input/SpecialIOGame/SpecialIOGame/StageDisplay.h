@@ -23,7 +23,6 @@ class StageDisplay
 		sf::RenderWindow* window;
 		sf::Texture texture;
 		sf::Sprite sprite;
-
-		int position[2];
+		sf::Vector2i position;
 };
 

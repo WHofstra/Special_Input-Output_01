@@ -43,6 +43,9 @@ int main()
 	//while (gameRunning) //Use This for OpenGL Rendering
 	while(window.isOpen())
 	{
+		//Update
+		player->Update();
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -53,6 +56,16 @@ int main()
 				//gameRunning = false; //Use This for OpenGL Rendering
 				window.close();
 			}
+			//Check Key Input
+			else if (event.type == sf::Event::KeyPressed)
+			{
+				player->GetPlayerControllerPress(&event);
+			}
+			//Check Key Release
+			else if (event.type == sf::Event::KeyReleased)
+			{
+				player->GetPlayerControllerRelease(&event);
+			}
 		}
 
 		//Clear Window
@@ -61,6 +74,7 @@ int main()
 		//Draw
 		window.draw(stageDisplay->GetStageWindowDisplay());
 		window.draw(player->GetWindowSpriteDisplay());
+		window.draw(player->GetWindowPlaneDisplay());
 
 		//Display Window
 		window.display();

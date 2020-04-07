@@ -1,6 +1,6 @@
 #pragma once
 #include "Character.h"
-#include <list>
+//#include <iostream>
 
 class Player :
 	public Character
@@ -9,15 +9,17 @@ class Player :
 		Player(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture);
 		~Player();
 
-		void SetSpriteProperties();
-		void GetPlayerController(sf::Event* event);
-		void SetPlayerVelocity(int velX, int velY);
-		void SetPlayerRotation(int anAngle);
+		virtual void Update() override;
 
-		std::list<sf::Keyboard::Key> GetPlayerControls(std::list<sf::Keyboard::Key> aList);
+		void SetSpriteProperties();
+		void GetPlayerControllerPress(sf::Event* event);
+		void GetPlayerControllerRelease(sf::Event* event);
+
+		sf::ConvexShape SetPlaneDisplay(sf::Vector2f* aPos, int aRot, float aPlane[]);
+		sf::ConvexShape GetWindowPlaneDisplay();
 
 	private:
-		std::list<sf::Keyboard::Key> playerControls;
-		std::list<sf::Keyboard::Key>::iterator controlIt;
+		sf::ConvexShape plane;
+		float planeValues[2];
 };
 
