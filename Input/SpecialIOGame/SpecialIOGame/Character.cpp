@@ -3,8 +3,8 @@
 Character::Character(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture)
 	: currentCharacter(&aType)
 {
-	position = sf::Vector2f(aPosX, aPosY);
-	velocity = sf::Vector2f(0, 0);
+	position = sf::Vector2f((float)aPosX, (float)aPosY);
+	velocity = sf::Vector2f(0.0f, 0.0f);
 	speed = sf::Vector2f(0.05f, 0.075f);
 
 	sprite = SetCharacterSprite(aTexture);
@@ -22,7 +22,7 @@ void Character::Update()
 {
 	position += velocity;
 	sprite.setPosition(position);
-	sprite.setRotation(rotation);
+	sprite.setRotation((float)rotation);
 }
 
 sf::Sprite Character::SetCharacterSprite(sf::Texture* aTexture)
@@ -41,8 +41,8 @@ sf::Sprite Character::GetWindowSpriteDisplay()
 
 void Character::SetVelocity(int velX, int velY)
 {
-	velocity.x = velX;
-	velocity.y = velY;
+	velocity.x = (float)velX;
+	velocity.y = (float)velY;
 }
 
 void Character::SetRotation(int aRot)

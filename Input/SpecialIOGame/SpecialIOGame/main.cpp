@@ -5,6 +5,7 @@
 #include "Stage.h"
 #include "StageDisplay.h"
 #include "Player.h"
+#include "Controller.h"
 
 int main()
 {
@@ -12,9 +13,16 @@ int main()
 	const int WIN_WIDTH  = 512;
 	const int WIN_HEIGHT = 448;
 
+	//Define Server Info
+	std::string serverUrl = "http://29980.hosts2.ma-cloud.nl";
+	std::string filePath  = "/bewijzenmap/SpIO/test.json";
+
 	//Create Window
 	sf::RenderWindow window(sf::VideoMode(WIN_WIDTH, WIN_HEIGHT), "Special Output",
 		sf::Style::Titlebar | sf::Style::Close); //No Resizing Possible
+
+	//Set Controller
+	Controller* controller = new Controller(&serverUrl, &filePath, &window);
 
 	//Define Stages
 	std::list<Stage*> stages = { new Stage(Stage::StageName::DONUT_PLAINS),
@@ -45,6 +53,7 @@ int main()
 	{
 		//Update
 		player->Update();
+		controller->Update();
 
 		sf::Event event;
 		while (window.pollEvent(event))
