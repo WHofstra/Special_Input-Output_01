@@ -1,4 +1,5 @@
 #include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
 #include <Wire.h>
 
 const float MPU_GYRO_250_SCALE = 131.0;
@@ -10,16 +11,20 @@ const float MPU_ACCL_4_SCALE = 8192.0;
 const float MPU_ACCL_8_SCALE = 4096.0;
 const float MPU_ACCL_16_SCALE = 2048.0;
 
-const char* ssid     = "Medialab";
-const char* password = "Mediacollege";
-const char* server   = "29980.hosts2.ma-cloud.nl";
-const int MPU_addr   = 0x68; // I2C address of the MPU-6050
-const int portNr     = 80;
+const char* ssid      = "Medialab";
+const char* password  = "Mediacollege";
+const char* server    = "29980.hosts2.ma-cloud.nl";
+const int MPU_addr    = 0x68; // I2C address of the MPU-6050
+const int portNr      = 80;
+const int docCapacity = JSON_OBJECT_SIZE(6);
 
 String aPath         = "/bewijzenmap/SpIO/testGetPost.php";
 String g             = "GET";
 String gyroString    = "{}";
 String httpResponse;
+
+StaticJsonDocument<docCapacity> jsonDoc;
+JsonObject jsonObj = jsonDoc.to<JsonObject>();
 
 static const uint8_t wifiPin = D4; //Use D4-pin as Output
 
@@ -30,7 +35,7 @@ struct rawdata
 
 struct scaleddata
 {
-  float AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
+  int AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 };
 
 scaleddata sdValues;
@@ -51,10 +56,9 @@ void loop()
   }
   setMPU6050scales(MPU_addr,0b00000000,0b00010000);
   sdValues = convertRawToScaled(MPU_addr, mpu6050Read(MPU_addr));
+  jsonObj = addValuesToJsonDoc(&sdValues);
 
-  if (sdValues.AcX > 1 || sdValues.AcX < -1){
-    httpRequest(aPath, g, gyroString); //Send String to Ma-Cloud
-  }
+  Serial.println(jsonDoc.as<String>());
   
   delay(500);
 }
@@ -174,23 +178,35 @@ scaleddata convertRawToScaled(byte addr, rawdata data_in)
   values.AcZ = (float) data_in.AcZ / scale_value;
   values.Tmp = (float) data_in.Tmp / 340.0 + 36.53;
 
-  gyroString = generateJson(gyroString, values);
+  //gyroString = generateJson(gyroString, &values);
   return values;
 }
 
-String generateJson(String stringStart, scaleddata val)
+String generateJson(String stringStart, scaleddata* val)
 {
   //Generate Json-string from Values
   stringStart = "{";
-  stringStart = addToJsonString(val.AcX, "AcX", stringStart, false);
-  stringStart = addToJsonString(val.AcY, "AcY", stringStart, false);
-  stringStart = addToJsonString(val.AcZ, "AcZ", stringStart, false);
-  stringStart = addToJsonString(val.GyX, "GyX", stringStart, false);
-  stringStart = addToJsonString(val.GyY, "GyY", stringStart, false);
-  stringStart = addToJsonString(val.GyZ, "GyZ", stringStart, true);
+  stringStart = addToJsonString(val->AcX, "AcX", stringStart, false);
+  stringStart = addToJsonString(val->AcY, "AcY", stringStart, false);
+  stringStart = addToJsonString(val->AcZ, "AcZ", stringStart, false);
+  stringStart = addToJsonString(val->GyX, "GyX", stringStart, false);
+  stringStart = addToJsonString(val->GyY, "GyY", stringStart, false);
+  stringStart = addToJsonString(val->GyZ, "GyZ", stringStart, true);
   
   Serial.println(stringStart);
   return stringStart;
+}
+
+JsonObject addValuesToJsonDoc(scaleddata* val)
+{
+  jsonObj["AcX"] = val->AcX;
+  jsonObj["AcY"] = val->AcY;
+  jsonObj["AcZ"] = val->AcZ;
+  jsonObj["GyX"] = val->GyX;
+  jsonObj["GyY"] = val->GyY;
+  jsonObj["GyZ"] = val->GyZ;
+
+  return jsonObj;
 }
 
 //Connect to Local Network
