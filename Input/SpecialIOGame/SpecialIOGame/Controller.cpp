@@ -29,5 +29,11 @@ Controller::~Controller()
 
 void Controller::Update()
 {
-    
+    response = http.sendRequest(request);
+    if (response.getStatus() != sf::Http::Response::Ok)
+    {
+        std::cout << "Request failed." << std::endl;
+        EXIT_FAILURE;
+        window->close();
+    }
 }

@@ -39,11 +39,9 @@ void Player::GetPlayerControllerPress(sf::Event* event)
 		case 0: //The 'A'-key, Move Left
 			//velocity.x = (cosf(rotation) * speed.x) + (sinf(rotation) * speed.y);
 			velocity.x = -speed.x;
-			rotation -= 5;
 			break;
 		case 3: //The 'D'-key, Move Right
 			velocity.x = speed.x;
-			rotation += 5;
 			break;
 		case 8: //The 'I'-key, Narrow Far Plane-of-view
 
@@ -65,10 +63,11 @@ void Player::GetPlayerControllerPress(sf::Event* event)
 			break;
 	}
 
-	if (rotation < 0)
+	/*if (rotation < 0)
 	{
 		rotation += 360;
-	}
+	}*/
+	rotation = (int)(atan2f(velocity.y, velocity.x) * (180 / M_PI));
 }
 
 void Player::GetPlayerControllerRelease(sf::Event* event)
@@ -99,10 +98,10 @@ sf::ConvexShape Player::SetPlaneDisplay(sf::Vector2f* aPos, int aRot, float aPla
 	shape.setOrigin(*aPos);
 
 	//Draw Shape
-	shape.setPoint(0, sf::Vector2f(aPos->x + (aPlane[1] / 2), aPos->y + (aPlane[1] / 2)));
-	shape.setPoint(1, sf::Vector2f(aPos->x - (aPlane[0] / 2), aPos->y + (aPlane[0] / 2)));
-	shape.setPoint(2, sf::Vector2f(aPos->x - (aPlane[0] / 2), aPos->y - (aPlane[0] / 2)));
-	shape.setPoint(3, sf::Vector2f(aPos->x + (aPlane[1] / 2), aPos->y - (aPlane[1] / 2)));
+	shape.setPoint(0, sf::Vector2f(aPos->x + (aPlane[0] / 2), aPos->y + (aPlane[0] / 2)));
+	shape.setPoint(1, sf::Vector2f(aPos->x - (aPlane[1] / 2), aPos->y + (aPlane[1] / 2)));
+	shape.setPoint(2, sf::Vector2f(aPos->x - (aPlane[1] / 2), aPos->y - (aPlane[1] / 2)));
+	shape.setPoint(3, sf::Vector2f(aPos->x + (aPlane[0] / 2), aPos->y - (aPlane[0] / 2)));
 
 	//Define Shape Properties
 	shape.setPosition(*aPos);

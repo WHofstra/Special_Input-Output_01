@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <iostream>
 
@@ -16,5 +18,9 @@ class Controller
 		sf::Http http;
 		sf::Http::Request request;
 		sf::Http::Response response;
+
+		sf::RenderWindow* window;
+
+		nlohmann::json values;
 };
 

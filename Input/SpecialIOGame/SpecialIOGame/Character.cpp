@@ -5,7 +5,7 @@ Character::Character(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* a
 {
 	position = sf::Vector2f((float)aPosX, (float)aPosY);
 	velocity = sf::Vector2f(0.0f, 0.0f);
-	speed = sf::Vector2f(0.05f, 0.075f);
+	speed = sf::Vector2f(5.0f, 7.5f);
 
 	sprite = SetCharacterSprite(aTexture);
 	sprite.setPosition((float)position.x, (float)position.y);
