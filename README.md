@@ -7,3 +7,6 @@ _Leden:_
 
 Trello Link:
 _https://trello.com/b/eIxdbnAq/gyroscoop-sensor-special-input_
+
+YouTube Video Link:
+_https://youtu.be/e5K3rQtF4Vo_
