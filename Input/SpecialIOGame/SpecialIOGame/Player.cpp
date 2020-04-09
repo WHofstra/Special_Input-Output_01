@@ -24,6 +24,14 @@ void Player::Update()
 	plane.setRotation(rotation);
 }
 
+void Player::SetBoundaries(sf::RenderWindow* aWindow, int beginX, int beginY)
+{
+	bounds[0] = beginX;
+	bounds[1] = beginY;
+	bounds[2] = aWindow->getSize().x;
+	bounds[3] = aWindow->getSize().y;
+}
+
 void Player::SetSpriteProperties()
 {
 	sprite.setColor(sf::Color(253, 0, 45, 255));
@@ -35,29 +43,47 @@ void Player::GetPlayerControllerPress(sf::Event* event)
 	switch (event->key.code)
 	{
 		case 0: //The 'A'-key, Move Left
-			//velocity.x = (cosf(rotation) * speed.x) + (sinf(rotation) * speed.y);
-			velocity.x = -speed.x;
+			if (position.x > (float)bounds[0])
+			{
+				velocity.x = -speed.x;
+			}
+			else
+			{
+				velocity.x = 0;
+			}
 			break;
+
 		case 3: //The 'D'-key, Move Right
-			velocity.x = speed.x;
+			if (position.x < (float)bounds[2])
+			{
+				velocity.x = speed.x;
+			}
+			else
+			{
+				velocity.x = 0;
+			}
 			break;
-		case 8: //The 'I'-key, Narrow Far Plane-of-view
 
-			break;
-		case 10: //The 'K'-key, Widen Near Plane-of-view
-
-			break;
-		case 11: //The 'L'-key, Narrow Near Plane-of-view
-
-			break;
-		case 14: //The 'O'-key, Widen Far Plane-of-view
-
-			break;
 		case 18 : //The 'S'-key, Move Backwards
-			velocity.y = speed.y;
+			if (position.y < (float)bounds[3])
+			{
+				velocity.y = speed.y;
+			}
+			else
+			{
+				velocity.y = 0;
+			}
 			break;
+
 		case 22: //The 'W'-key, Move Forwards
-			velocity.y = -speed.y;
+			if (position.y > (float)bounds[1])
+			{
+				velocity.y = -speed.y;
+			}
+			else
+			{
+				velocity.y = 0;
+			}
 			break;
 	}
 
@@ -89,19 +115,45 @@ void Player::GetControllerJsonValues()
 	JsonValuesCheckVertical(controller, 4, controller->GyY_VALUE_TRIGGER);
 }
 
+void Player::CheckBoundaries(sf::Vector2f* aPos, sf::Vector2i* aBound)
+{
+}
+
 void Player::JsonValuesCheckHorizontal(Controller* aController, int valueIt, int aValue)
 {
 	if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) > aValue)
 	{
-		velocity.x = -speed.x;
+		if (position.x > (float)bounds[0])
+		{
+			velocity.x = -speed.x;
+		}
+		else
+		{
+			velocity.x = 0;
+		}
 	}
 	else if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) < -aValue)
 	{
-		velocity.x = speed.x;
+		if (position.x < (float)bounds[2])
+		{
+			velocity.x = speed.x;
+		}
+		else
+		{
+			velocity.x = 0;
+		}
 	}
 	else
 	{
 		velocity.x = 0;
+	}
+
+	if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) > aValue ||
+		aController->GetValues().at(aController->GetValueNames().at(valueIt)) < -aValue)
+	{
+		rotation = (int)(atan2f(velocity.y, velocity.x) * (180 / M_PI));
+		std::cout << aController->GetValueNames().at(valueIt) << ": " <<
+			aController->GetValues().at(aController->GetValueNames().at(valueIt)) << std::endl;
 	}
 }
 
@@ -109,15 +161,37 @@ void Player::JsonValuesCheckVertical(Controller* aController, int valueIt, int a
 {
 	if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) > aValue)
 	{
-		velocity.y = -speed.y;
+		if (position.y > (float)bounds[1])
+		{
+			velocity.y = -speed.y;
+		}
+		else
+		{
+			velocity.y = 0;
+		}
 	}
 	else if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) < -aValue)
 	{
-		velocity.y = speed.y;
+		if (position.y < (float)bounds[3])
+		{
+			velocity.y = speed.y;
+		}
+		else
+		{
+			velocity.y = 0;
+		}
 	}
 	else
 	{
 		velocity.y = 0;
+	}
+
+	if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) > aValue ||
+	    aController->GetValues().at(aController->GetValueNames().at(valueIt)) < -aValue)
+	{
+		rotation = (int)(atan2f(velocity.y, velocity.x) * (180 / M_PI));
+		std::cout << aController->GetValueNames().at(valueIt) << ": " <<
+		aController->GetValues().at(aController->GetValueNames().at(valueIt)) << std::endl;
 	}
 }
 

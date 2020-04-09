@@ -40,6 +40,7 @@ int main()
 	//Define Characters
 	Player* player = new Player(WIN_WIDTH / 2, WIN_HEIGHT / 2, 0,
 		Character::CType::WALUIGI, &objectTexture, controller);
+	player->SetBoundaries(&window);
 
 	//List Iterator Pointing to Start of List
 	std::list<Stage*>::iterator sIt = stages.begin();
