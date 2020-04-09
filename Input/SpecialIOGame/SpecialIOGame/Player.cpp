@@ -1,17 +1,14 @@
 #include "Player.h"
 
-Player::Player(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture)
-	: Character::Character(aPosX, aPosY, aRot, aType, aTexture)
+Player::Player(int aPosX, int aPosY, int aRot, CType aType, sf::Texture* aTexture,
+	Controller* aController)
+	: Character::Character(aPosX, aPosY, aRot, aType, aTexture), controller(aController)
 {
 	planeValues[0] = 80.0f;
 	planeValues[1] = 20.0f;
 
 	SetSpriteProperties();
 	plane = SetPlaneDisplay(&position, aRot, planeValues);
-
-	/* Debug
-	std::cout << "Color: { " << (int)plane.getFillColor().r << ", " << (int)plane.getFillColor().g << ", "
-		      << (int)plane.getFillColor().b << ", " << (int)plane.getFillColor().a << " }" << std::endl;//*/
 }
 
 Player::~Player()
@@ -22,6 +19,7 @@ Player::~Player()
 void Player::Update()
 {
 	Character::Update();
+	GetControllerJsonValues();
 	plane.setPosition(position);
 	plane.setRotation(rotation);
 }
@@ -63,10 +61,6 @@ void Player::GetPlayerControllerPress(sf::Event* event)
 			break;
 	}
 
-	/*if (rotation < 0)
-	{
-		rotation += 360;
-	}*/
 	rotation = (int)(atan2f(velocity.y, velocity.x) * (180 / M_PI));
 }
 
@@ -75,17 +69,55 @@ void Player::GetPlayerControllerRelease(sf::Event* event)
 	switch (event->key.code)
 	{
 	case 0: //The 'A'-key, Move Left
-		velocity.x = 0;
+		if (!sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { velocity.x = 0; }
 		break;
 	case 3: //The 'D'-key, Move Right
-		velocity.x = 0;
+		if (!sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { velocity.x = 0; }
 		break;
 	case 18: //The 'S'-key, Move Backwards
-		velocity.y = 0;
+		if (!sf::Keyboard::isKeyPressed(sf::Keyboard::W)) { velocity.y = 0; }
 		break;
 	case 22: //The 'W'-key, Move Forwards
-		velocity.y = 0;
+		if (!sf::Keyboard::isKeyPressed(sf::Keyboard::S)) { velocity.y = 0; }
 		break;
+	}
+}
+
+void Player::GetControllerJsonValues()
+{
+	JsonValuesCheckHorizontal(controller, 5, controller->GyZ_VALUE_TRIGGER);
+	JsonValuesCheckVertical(controller, 4, controller->GyY_VALUE_TRIGGER);
+}
+
+void Player::JsonValuesCheckHorizontal(Controller* aController, int valueIt, int aValue)
+{
+	if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) > aValue)
+	{
+		velocity.x = -speed.x;
+	}
+	else if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) < -aValue)
+	{
+		velocity.x = speed.x;
+	}
+	else
+	{
+		velocity.x = 0;
+	}
+}
+
+void Player::JsonValuesCheckVertical(Controller* aController, int valueIt, int aValue)
+{
+	if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) > aValue)
+	{
+		velocity.y = -speed.y;
+	}
+	else if (aController->GetValues().at(aController->GetValueNames().at(valueIt)) < -aValue)
+	{
+		velocity.y = speed.y;
+	}
+	else
+	{
+		velocity.y = 0;
 	}
 }
 
